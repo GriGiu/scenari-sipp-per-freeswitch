@@ -83,8 +83,8 @@
       <exec play_pcap_audio="./g711a.pcap"/>
     </action>
 </nop>
-
-  <pause milliseconds="8000"/>
+<!--Durata chiamata in ms-->
+  <pause milliseconds="30000"/>
 
   <send retrans="500">
     <![CDATA[

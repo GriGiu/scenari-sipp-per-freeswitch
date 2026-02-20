@@ -142,7 +142,7 @@
     </action>
 </nop>
 
-  <pause milliseconds="8000"/>
+  <pause milliseconds="30000"/>
   
   <send retrans="500">
     <![CDATA[

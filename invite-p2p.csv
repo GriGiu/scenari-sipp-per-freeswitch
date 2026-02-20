@@ -1,0 +1,7 @@
+SEQUENTIAL
+# Username;SIP Proxy;Auth;Destination
+7000;172.16.2.99;[authentication username=7000 password=123456];7001;
+7002;172.16.2.99;[authentication username=7002 password=123456];7003;
+7004;172.16.2.99;[authentication username=7004 password=123456];7005;
+7006;172.16.2.99;[authentication username=7006 password=123456];7007;
+7008;172.16.2.99;[authentication username=7008 password=123456];7009;
