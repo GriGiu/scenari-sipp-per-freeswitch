@@ -7,63 +7,63 @@ Negli scenari proposti, SIPp agisce come **UAC (User Agent Client)**, ovvero è 
 
 #  REGISTRAZIONE - settare con -m quante register inviare
 docker run -it --network host \\
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/register.xml\
-  -inf /scenarios/register-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -r 1  \
-  -rp 1 \
-  -m 100 \
-  -aa \
-  -trace_msg -trace_err \
+  -v /home/grigiu/sipp/scenari:/scenarios \\
+  -w /scenarios \\
+  ghcr.io/grigiu/sipp:26.050.92 \\
+  172.16.2.99:5060 \\
+  -sf /scenarios/register.xml \\
+  -inf /scenarios/register-accounts.csv \\
+  -i 192.168.255.14:5060 \\
+  -r 1  \\
+  -rp 1 \\
+  -m 100 \\
+  -aa \\
+  -trace_msg -trace_err \\
   -message_file /scenarios/register.log
 
 
 # CHIAMATA SENZA AUTH (se FreeSwitch risponde subito 200 OK)
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-without-auth.xml \
-  -inf /scenarios/invite-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -m 1 -r 1 \
-  -trace_msg -trace_err \
+docker run -it --network host \\
+  -v /home/grigiu/sipp/scenari:/scenarios \\
+  -w /scenarios \\
+  ghcr.io/grigiu/sipp:26.050.92 \\
+  172.16.2.99:5060 \\
+  -sf /scenarios/invite-without-auth.xml \\
+  -inf /scenarios/invite-accounts.csv \\
+  -i 192.168.255.14:5060 \\
+  -m 1 -r 1 \\
+  -trace_msg -trace_err \\
   -message_file /scenarios/invite-noauth.log
 
 
 - **Durata Chiamata**: Per cambiare quanto dura una chiamata, apri il file `.xml` e cerca la riga `<pause milliseconds="30000"/>`. Cambia il valore (es. 60000 per un minuto).
 
 # TEST DI CARICO (es. 500 chiamate,  4 chiamate al secondo, max 50 simultanee)
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-without-auth.xml \
-  -inf /scenarios/invite-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -m 500 \
-  -r 4 -rp 1000 \
-  -l 50 \
-  -trace_msg -trace_err \
+docker run -it --network host \\
+  -v /home/grigiu/sipp/scenari:/scenarios \\
+  -w /scenarios \\
+  ghcr.io/grigiu/sipp:26.050.92 \\
+  172.16.2.99:5060 \\
+  -sf /scenarios/invite-without-auth.xml \\
+  -inf /scenarios/invite-accounts.csv \\
+  -i 192.168.255.14:5060 \\
+  -m 500 \\
+  -r 4 -rp 1000 \\
+  -l 50 \\
+  -trace_msg -trace_err \\
   -message_file /scenarios/loadtest.log
 
 # TEST P2P (Chiamate tra interni 7000 -> 7001, ecc.) (TBD)
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-auth.xml \
-  -inf /scenarios/invite-p2p.csv \
-  -i 192.168.255.14:5060 \
-  -m 1 -r 1 \
-  -trace_msg -trace_err \
+docker run -it --network host \\
+  -v /home/grigiu/sipp/scenari:/scenarios \\
+  -w /scenarios \\
+  ghcr.io/grigiu/sipp:26.050.92 \\
+  172.16.2.99:5060 \\
+  -sf /scenarios/invite-auth.xml \\
+  -inf /scenarios/invite-p2p.csv \\
+  -i 192.168.255.14:5060 \\
+  -m 1 -r 1 \\
+  -trace_msg -trace_err \\
   -message_file /scenarios/p2p.log
 
 
