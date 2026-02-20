@@ -6,7 +6,7 @@ Negli scenari proposti, SIPp agisce come **UAC (User Agent Client)**, ovvero è 
 
 
 #  REGISTRAZIONE - settare con -m quante register inviare
-docker run -it --network host \
+docker run -it --network host \\
   -v /home/grigiu/sipp/scenari:/scenarios \
   -w /scenarios \
   ghcr.io/grigiu/sipp:26.050.92 \
