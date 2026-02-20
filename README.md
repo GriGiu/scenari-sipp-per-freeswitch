@@ -1,23 +1,5 @@
-# sipp2freeswitch
-sample sipp scenarios for testing freeswitch
-
-Used following resources:
-
-https://github.com/jrzondagh/SIPp-Scenario-Files
-
-https://github.com/saghul/sipp-scenarios
-
-./sipp -i local_ip_address -sf ./register.xml -inf ./register-accounts.csv destination_ip_address:5060 -r 1 -rp 1000 -aa -trace_err
-
-./sipp -i local_ip_address -sf ./invite-auth.xml -inf ./invite-accounts.csv destination_ip_address:5060 -r 1 -rp 1000 -trace_err
-
-./sipp -i local_ip_address -sf ./invite-without-auth.xml -inf ./invite-accounts.csv destination_ip_address:5060 -r 1 -rp 1000 -trace_err
-
-./sipp -sf ./uas.xml -i local_ip_address -p 5060
-
-
-
-- **Durata Chiamata**: Per cambiare quanto dura una chiamata, apri il file `.xml` e cerca la riga `<pause milliseconds="30000"/>`. Cambia il valore (es. 60000 per un minuto).
+# SIPp per test carico di freeswitch
+Semplici scenari di chiamata per test di carico di  freeswitch
 
 ## Funzionamento e Architettura
 Negli scenari proposti, SIPp agisce come **UAC (User Agent Client)**, ovvero è lui che "prende l'iniziativa" (invia REGISTER o INVITE).
@@ -49,7 +31,69 @@ Se vuoi testare chiamate tra interni senza usare l'Echo Test, devi dividere gli 
    - Quando FreeSwitch riceve la chiamata per il 7001, "guarda" nei suoi database di registrazione e vede che il 7001 è sulla **VM-B**, quindi gli gira l'INVITE.
 3. **Il Ruolo del UAS**: Il SIPp sulla VM-B riceve l'INVITE, risponde con `180 Ringing` e poi `200 OK` (simulando una persona che risponde). Questo permette alla chiamata di instaurarsi correttamente tra le due VM attraverso FreeSwitch.
 
-#### Comandi per Scenario Distribuito
+#  REGISTRAZIONE - settare con -m quante register inviare
+docker run -it --network host \
+  -v /home/grigiu/sipp/scenari:/scenarios \
+  -w /scenarios \
+  ghcr.io/grigiu/sipp:26.050.92 \
+  172.16.2.99:5060 \
+  -sf /scenarios/register.xml\
+  -inf /scenarios/register-accounts.csv \
+  -i 192.168.255.14:5060 \
+  -r 1  \
+  -rp 1 \
+  -m 100 \
+  -aa \
+  -trace_msg -trace_err \
+  -message_file /scenarios/register.log
+
+
+# CHIAMATA SENZA AUTH (se FreeSwitch risponde subito 200 OK)
+docker run -it --network host \
+  -v /home/grigiu/sipp/scenari:/scenarios \
+  -w /scenarios \
+  ghcr.io/grigiu/sipp:26.050.92 \
+  172.16.2.99:5060 \
+  -sf /scenarios/invite-without-auth.xml \
+  -inf /scenarios/invite-accounts.csv \
+  -i 192.168.255.14:5060 \
+  -m 1 -r 1 \
+  -trace_msg -trace_err \
+  -message_file /scenarios/invite-noauth.log
+
+
+- **Durata Chiamata**: Per cambiare quanto dura una chiamata, apri il file `.xml` e cerca la riga `<pause milliseconds="30000"/>`. Cambia il valore (es. 60000 per un minuto).
+
+# TEST DI CARICO (es. 500 chiamate,  4 chiamate al secondo, max 50 simultanee)
+docker run -it --network host \
+  -v /home/grigiu/sipp/scenari:/scenarios \
+  -w /scenarios \
+  ghcr.io/grigiu/sipp:26.050.92 \
+  172.16.2.99:5060 \
+  -sf /scenarios/invite-without-auth.xml \
+  -inf /scenarios/invite-accounts.csv \
+  -i 192.168.255.14:5060 \
+  -m 500 \
+  -r 4 -rp 1000 \
+  -l 50 \
+  -trace_msg -trace_err \
+  -message_file /scenarios/loadtest.log
+
+# TEST P2P (Chiamate tra interni 7000 -> 7001, ecc.) (TBD)
+docker run -it --network host \
+  -v /home/grigiu/sipp/scenari:/scenarios \
+  -w /scenarios \
+  ghcr.io/grigiu/sipp:26.050.92 \
+  172.16.2.99:5060 \
+  -sf /scenarios/invite-auth.xml \
+  -inf /scenarios/invite-p2p.csv \
+  -i 192.168.255.14:5060 \
+  -m 1 -r 1 \
+  -trace_msg -trace_err \
+  -message_file /scenarios/p2p.log
+
+
+#### Comandi per Scenario Distribuito (P2P)
 
 **Sulla VM-B (UAS - Destinatari):**
 ```bash
@@ -69,76 +113,4 @@ docker run -it --network host -v /home/grigiu/sipp/scenari:/scenarios -w /scenar
 docker run -it --network host -v /home/grigiu/sipp/scenari:/scenarios -w /scenarios ghcr.io/grigiu/sipp:26.050.92 172.16.2.99:5060 -sf /scenarios/invite-auth.xml -inf /scenarios/invite-distributed.csv -i 192.168.255.14:5060 -m 5 -r 1
 ```
 
----
-
-# Scenari testati
-# OK) REGISTRAZIONE - settare con -m quante register inviare
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/register.xml\
-  -inf /scenarios/register-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -r 1  \
-  -rp 1 \
-  -m 1 \
-  -aa \
-  -trace_msg -trace_err \
-  -message_file /scenarios/register.log
-
-# CHIAMATA (INVITE) - settare con -m quante chiamate inviare
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-auth.xml \
-  -inf /scenarios/invite-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -m 1 \
-  -r 1 \
-  -trace_msg -trace_err \
-  -message_file /scenarios/invite.log
-
-# OK) CHIAMATA SENZA AUTH (se FreeSwitch risponde subito 200 OK)
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-without-auth.xml \
-  -inf /scenarios/invite-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -m 1 -r 1 \
-  -trace_msg -trace_err \
-  -message_file /scenarios/invite-noauth.log
-
-# TEST DI CARICO (es. 10 chiamate al secondo, max 50 simultanee)
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-without-auth.xml \
-  -inf /scenarios/invite-accounts.csv \
-  -i 192.168.255.14:5060 \
-  -r 10 -rp 1000 \
-  -l 50 \
-  -trace_msg -trace_err \
-  -message_file /scenarios/loadtest.log
-
-# TEST P2P (Chiamate tra interni 7000 -> 7001, ecc.)
-docker run -it --network host \
-  -v /home/grigiu/sipp/scenari:/scenarios \
-  -w /scenarios \
-  ghcr.io/grigiu/sipp:26.050.92 \
-  172.16.2.99:5060 \
-  -sf /scenarios/invite-auth.xml \
-  -inf /scenarios/invite-p2p.csv \
-  -i 192.168.255.14:5060 \
-  -m 1 -r 1 \
-  -trace_msg -trace_err \
-  -message_file /scenarios/p2p.log
   
